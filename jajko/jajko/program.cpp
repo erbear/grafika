@@ -15,24 +15,35 @@
 
 typedef GLfloat point3[3];
 using namespace std;
-
+static GLfloat theta[] = {0.0, 0.0, 0.0};
 /*************************************************************************************/
 int model = 1;  // 1- punkty, 2- siatka, 3 - wype³nione trójk¹ty
 // Funkcja rysuj¹ca osie uk³adu wspó³rzêdnych
+point3** kolory;
 float randomColor()
 {
 	return ((float)(rand()%10)+1)/10; 
+} 
+void spinEgg()
+{
+    theta[0] -= 0.1;
+    if( theta[0] > 360.0 ) theta[0] -= 360.0;
+
+    theta[1] -= 0.1;
+    if( theta[1] > 360.0 ) theta[1] -= 360.0;
+
+    theta[2] -= 0.1;
+    if( theta[2] > 360.0 ) theta[2] -= 360.0;
+
+    glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
 }
 void Egg(void)
 {
 	int n = 20;
 	point3** tablica = new point3*[n];
-	point3** kolory = new point3*[n];
 	for (int i =0; i < n; i++)
 	{
-
 		tablica[i] = new point3[n];
-		kolory[i] = new point3[n];
 
 		float u = (float)i/(float)n;
 
@@ -44,9 +55,7 @@ void Egg(void)
 			tablica[i][j][0] = x;
 			tablica[i][j][1] = y - 5;
 			tablica[i][j][2] = z;
-			kolory[i][j][0] = randomColor();
-			kolory[i][j][1] = randomColor();
-			kolory[i][j][2] = randomColor();
+			
 			//glBegin(GL_POINTS);
 			//	glVertex3fv(p);
 			//glEnd();
@@ -169,7 +178,7 @@ void Egg(void)
 					}
 					
 				glEnd();
-			} else {
+			} else{
 				glBegin(GL_TRIANGLES);
 						glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
 						glVertex3fv(tablica[i][j]);
@@ -181,13 +190,13 @@ void Egg(void)
 						}
 						else
 						{
-							if (i<n-2)
+							if (i<n-i-1)
 							{
-								glColor3f(kolory[n-2][0][0],kolory[n-2][0][1],kolory[n-2][0][2]); 
-								glVertex3fv(tablica[n-2][0]);
+								glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
+								glVertex3fv(tablica[n-i-1][0]);
 							}	else {
-								glColor3f(kolory[1][0][0],kolory[1][0][1],kolory[1][0][2]); 
-								glVertex3fv(tablica[1][0]);
+								glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
+								glVertex3fv(tablica[n-i-1][0]);
 							}
 						}
 				glEnd();
@@ -202,10 +211,19 @@ void Egg(void)
 						}
 						else
 						{
-							glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
-							glVertex3fv(tablica[n-i-1][0]);
-							glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
-							glVertex3fv(tablica[n-i][0]);
+							if (i<n-i)
+							{
+								glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
+								glVertex3fv(tablica[n-i-1][0]);
+								glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
+								glVertex3fv(tablica[n-i][0]);
+							} else
+							{
+								glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
+								glVertex3fv(tablica[n-i-1][0]);
+								glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
+								glVertex3fv(tablica[n-i][0]);
+							}
 						}
 				glEnd();
 			}
@@ -273,13 +291,19 @@ void RenderScene(void)
 	// Narysowanie osi przy pomocy funkcji zdefiniowanej wy¿ej 
 	glColor3f(1.0f, 1.0f, 1.0f); // Ustawienie koloru rysowania na bia³y 
 
-	glRotated(60.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
+	glRotated(0.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
+	
+	glRotatef(theta[0], 1.0, 0.0, 0.0);
+
+	glRotatef(theta[1], 0.0, 1.0, 0.0);
+
+	glRotatef(theta[2], 0.0, 0.0, 1.0);
 
 	Egg();
 	glFlush();
 	// Przekazanie poleceñ rysuj¹cych do wykonania
 
-
+	
 	glutSwapBuffers();
 	// 
 
@@ -380,7 +404,17 @@ void keys(unsigned char key, int x, int y)
 }
 void main(void)
 {
-	
+	int n = 20;
+	kolory = new point3*[n];
+	for (int i =0; i < n; i++)
+	{
+		kolory[i] = new point3[n];
+		for (int j = 0; j < n; j++){
+			kolory[i][j][0] = randomColor();
+			kolory[i][j][1] = randomColor();
+			kolory[i][j][2] = randomColor();
+		}
+	}
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 	glutInitWindowSize(300, 300);
@@ -406,7 +440,8 @@ void main(void)
 
 	glEnable(GL_DEPTH_TEST);
 	// W³¹czenie mechanizmu usuwania powierzchni niewidocznych
-
+	
+	glutIdleFunc(spinEgg);
 	glutMainLoop();
 	// Funkcja uruchamia szkielet biblioteki GLUT
 
