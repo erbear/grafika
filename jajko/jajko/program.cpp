@@ -105,6 +105,7 @@ void Egg(void)
 	{
 		for (int j = 0; j < n; j++){
 			if ( i == 0 ){
+			//if ( false){
 				glBegin(GL_TRIANGLES);
 					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
 					glVertex3fv(tablica[i][j]);
@@ -122,6 +123,7 @@ void Egg(void)
 					
 				glEnd();
 			} else if (i==n-1){
+			//} else if (false){
 				glBegin(GL_TRIANGLES);
 					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
 					glVertex3fv(tablica[i][j]);
@@ -158,8 +160,8 @@ void Egg(void)
 						glColor3f(kolory[i][j+1][0],kolory[i][j+1][1],kolory[i][j+1][2]); 
 						glVertex3fv(tablica[i][j+1]);
 					}
-					glColor3f(kolory[n/2-1][0][0],kolory[n/2-1][0][1],kolory[n/2-1][0][2]); 
-					glVertex3fv(tablica[n/2-1][0]);
+					glColor3f(kolory[n/2][0][0],kolory[n/2][0][1],kolory[n/2][0][2]); 
+					glVertex3fv(tablica[n/2][0]);
 				glEnd();
 			} else if ( i==n/2 ){
 				glBegin(GL_TRIANGLES);
