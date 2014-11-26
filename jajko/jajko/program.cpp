@@ -17,16 +17,22 @@ typedef GLfloat point3[3];
 using namespace std;
 
 /*************************************************************************************/
-
+int model = 1;  // 1- punkty, 2- siatka, 3 - wype³nione trójk¹ty
 // Funkcja rysuj¹ca osie uk³adu wspó³rzêdnych
+float randomColor()
+{
+	return ((float)(rand()%10)+1)/10; 
+}
 void Egg(void)
 {
 	int n = 20;
 	point3** tablica = new point3*[n];
+	point3** kolory = new point3*[n];
 	for (int i =0; i < n; i++)
 	{
 
 		tablica[i] = new point3[n];
+		kolory[i] = new point3[n];
 
 		float u = (float)i/(float)n;
 
@@ -35,20 +41,101 @@ void Egg(void)
 			float x = (-1 * 90 * pow(u, 5) + 225 * pow(u, 4) - 270 * pow(u, 3) + 180 * pow(u, 2) - 45 * u) * cos(M_PI * v);
 			float y = 160 * pow(u, 4) - 320 * pow(u, 3) + 160 * pow(u, 2);
 			float z = (-1 * 90 * pow(u, 5) + 225 * pow(u, 4) - 270 * pow(u, 3)  +180 * pow(u, 2) - 45 * u) * sin(M_PI * v);
-			point3 p;
-			p[0] = x;
-			p[1] = y - 5;
-			p[2] = z;
 			tablica[i][j][0] = x;
 			tablica[i][j][1] = y - 5;
 			tablica[i][j][2] = z;
+			kolory[i][j][0] = randomColor();
+			kolory[i][j][1] = randomColor();
+			kolory[i][j][2] = randomColor();
+			//glBegin(GL_POINTS);
+			//	glVertex3fv(p);
+			//glEnd();
+			//glBegin(GL_LINES);
+				
+			//glEnd();
 
-			glBegin(GL_POINTS);
-				glVertex3fv(p);
-			glEnd();
 		}
 	}
+	/*
+	for (int i =0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++){
+			//glBegin(GL_POINTS);
+			//	glVertex3fv(tablica[i][j]);
+			//glEnd();
+			//linie w poziomie
+			glBegin(GL_LINES);
+				glVertex3fv(tablica[i][j]);
+				if (j==n-1)
+					if ((n-i)!=0 && (n-i)!=n)
+						glVertex3fv(tablica[n-i][0]);
+					else 
+						true;
+				else
+					glVertex3fv(tablica[i][j+1]);
+			glEnd();
+			//linie w pionie
+			glBegin(GL_LINES);
+				glVertex3fv(tablica[i][j]);
+				if (i==n-1)
+					glVertex3fv(tablica[0][0]);
+				else
+					glVertex3fv(tablica[i+1][j]);
+			glEnd();
+			//linie przek¹tne
+			//glBegin(GL_LINES);
+			//	glVertex3fv(tablica[i][j]);
+			//	if (!((j==n-1) || (i == n-1)))
+			//		glVertex3fv(tablica[i+1][j+1]);
+			//glEnd();
+		}
 
+	}
+	*/
+	for (int i =0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++){
+			if ( i == 0 ){
+				glBegin(GL_TRIANGLES);
+					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+					glVertex3fv(tablica[i][j]);
+					glColor3f(kolory[i+1][j][0],kolory[i+1][j][1],kolory[i+1][j][2]); 
+					glVertex3fv(tablica[i+1][j]);
+					if (j==n-1){
+						glColor3f(kolory[n-1][0][0],kolory[n-1][0][1],kolory[n-1][0][2]); 
+						glVertex3fv(tablica[n-1][0]);
+					}
+					else
+					{
+						glColor3f(kolory[i+1][j+1][0],kolory[i+1][j+1][1],kolory[i+1][j+1][2]); 
+						glVertex3fv(tablica[i+1][j+1]);
+					}
+					
+				glEnd();
+			}
+			if (i==n-1){
+				glBegin(GL_TRIANGLES);
+					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+					glVertex3fv(tablica[i][j]);
+					if (j==n-1){
+						if ((n-i)!=0 && (n-i)!=n){
+							glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
+							glVertex3fv(tablica[n-i][0]);
+						}
+						else 
+							true;
+					}
+					else
+					{
+						glColor3f(kolory[i][j+1][0],kolory[i][j+1][1],kolory[i][j+1][2]); 
+						glVertex3fv(tablica[i][j+1]);
+					}
+					glColor3f(kolory[0][0][0],kolory[0][0][1],kolory[0][0][2]); 
+					glVertex3fv(tablica[0][0]);
+				glEnd();
+			}
+		}
+	}
 }
 
 void Axes(void)
@@ -111,12 +198,11 @@ void RenderScene(void)
 	// Narysowanie osi przy pomocy funkcji zdefiniowanej wy¿ej 
 	glColor3f(1.0f, 1.0f, 1.0f); // Ustawienie koloru rysowania na bia³y 
 
-	glRotated(60.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
+	glRotated(70.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
 
 	Egg();
 	glFlush();
 	// Przekazanie poleceñ rysuj¹cych do wykonania
-
 
 
 	glutSwapBuffers();
@@ -209,10 +295,17 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 // G³ówny punkt wejœcia programu. Program dzia³a w trybie konsoli
 
 
-
+void keys(unsigned char key, int x, int y)
+{
+	if(key == 'p') model = 1;
+	if(key == 'w') model = 2;
+	if(key == 's') model = 3;
+    
+	RenderScene(); // przerysowanie obrazu sceny
+}
 void main(void)
 {
-
+	
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 	glutInitWindowSize(300, 300);
