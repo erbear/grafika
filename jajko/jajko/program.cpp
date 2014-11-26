@@ -112,8 +112,7 @@ void Egg(void)
 					}
 					
 				glEnd();
-			}
-			if (i==n-1){
+			} else if (i==n-1){
 				glBegin(GL_TRIANGLES);
 					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
 					glVertex3fv(tablica[i][j]);
@@ -132,6 +131,82 @@ void Egg(void)
 					}
 					glColor3f(kolory[0][0][0],kolory[0][0][1],kolory[0][0][2]); 
 					glVertex3fv(tablica[0][0]);
+				glEnd();
+			} else if (i==n/2-1){
+				glBegin(GL_TRIANGLES);
+					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+					glVertex3fv(tablica[i][j]);
+					if (j==n-1){
+						if ((n-i)!=0 && (n-i)!=n){
+							glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
+							glVertex3fv(tablica[n-i][0]);
+						}
+						else 
+							true;
+					}
+					else
+					{
+						glColor3f(kolory[i][j+1][0],kolory[i][j+1][1],kolory[i][j+1][2]); 
+						glVertex3fv(tablica[i][j+1]);
+					}
+					glColor3f(kolory[n/2-1][0][0],kolory[n/2-1][0][1],kolory[n/2-1][0][2]); 
+					glVertex3fv(tablica[n/2-1][0]);
+				glEnd();
+			} else if ( i==n/2 ){
+				glBegin(GL_TRIANGLES);
+					glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+					glVertex3fv(tablica[i][j]);
+					glColor3f(kolory[i+1][j][0],kolory[i+1][j][1],kolory[i+1][j][2]); 
+					glVertex3fv(tablica[i+1][j]);
+					if (j==n-1){
+						glColor3f(kolory[n/2-1][0][0],kolory[n/2-1][0][1],kolory[n/2-1][0][2]); 
+						glVertex3fv(tablica[n/2-1][0]);
+					}
+					else
+					{
+						glColor3f(kolory[i+1][j+1][0],kolory[i+1][j+1][1],kolory[i+1][j+1][2]); 
+						glVertex3fv(tablica[i+1][j+1]);
+					}
+					
+				glEnd();
+			} else {
+				glBegin(GL_TRIANGLES);
+						glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+						glVertex3fv(tablica[i][j]);
+						glColor3f(kolory[i+1][j][0],kolory[i+1][j][1],kolory[i+1][j][2]); 
+						glVertex3fv(tablica[i+1][j]);
+						if (j<n-1){
+							glColor3f(kolory[i+1][j+1][0],kolory[i+1][j+1][1],kolory[i+1][j+1][2]); 
+							glVertex3fv(tablica[i+1][j+1]);
+						}
+						else
+						{
+							if (i<n-2)
+							{
+								glColor3f(kolory[n-2][0][0],kolory[n-2][0][1],kolory[n-2][0][2]); 
+								glVertex3fv(tablica[n-2][0]);
+							}	else {
+								glColor3f(kolory[1][0][0],kolory[1][0][1],kolory[1][0][2]); 
+								glVertex3fv(tablica[1][0]);
+							}
+						}
+				glEnd();
+				glBegin(GL_TRIANGLES);
+						glColor3f(kolory[i][j][0],kolory[i][j][1],kolory[i][j][2]); 
+						glVertex3fv(tablica[i][j]);
+						if (j<n-1){
+							glColor3f(kolory[i][j+1][0],kolory[i][j+1][1],kolory[i][j+1][2]); 
+							glVertex3fv(tablica[i][j+1]);
+							glColor3f(kolory[i+1][j+1][0],kolory[i+1][j+1][1],kolory[i+1][j+1][2]); 
+							glVertex3fv(tablica[i+1][j+1]);
+						}
+						else
+						{
+							glColor3f(kolory[n-i-1][0][0],kolory[n-i-1][0][1],kolory[n-i-1][0][2]); 
+							glVertex3fv(tablica[n-i-1][0]);
+							glColor3f(kolory[n-i][0][0],kolory[n-i][0][1],kolory[n-i][0][2]); 
+							glVertex3fv(tablica[n-i][0]);
+						}
 				glEnd();
 			}
 		}
@@ -198,7 +273,7 @@ void RenderScene(void)
 	// Narysowanie osi przy pomocy funkcji zdefiniowanej wy¿ej 
 	glColor3f(1.0f, 1.0f, 1.0f); // Ustawienie koloru rysowania na bia³y 
 
-	glRotated(70.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
+	glRotated(60.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
 
 	Egg();
 	glFlush();
