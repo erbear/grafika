@@ -37,12 +37,85 @@ void spinEgg()
 
     glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
 }
+void dzielTrojkaty(point3* p,point3 pw, float dlugoscBoku, float dlugoscWysokosci)
+{
+	float m = 2;
+	for (int i = 0; i<m-1; i++)
+	{ 
+		float nowaDlugoscBoku = dlugoscBoku / (float)m;
+		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
+		
+		for (int b = 0; b<4; b++)
+		{
+			point3* malaP = new point3[4];
+			malaP[0][0] = p[b][0];
+			malaP[0][1] = p[b][1];
+			malaP[0][2] = p[b][2];
+
+			malaP[1][0] = p[b][0];
+			malaP[1][1] = p[b][1];
+			malaP[1][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
+
+			malaP[2][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			malaP[2][1] = p[b][1];
+			malaP[2][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
+
+			malaP[3][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			malaP[3][1] = p[b][1];
+			malaP[3][2] = p[b][2];
+
+			p[b][0]= p[b][0]>0 ? p[b][0] - nowaDlugoscBoku*(i+1) : p[b][0] + nowaDlugoscBoku*(i+1);
+			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
+			p[b][2]= p[b][2]>0 ? p[b][2] - nowaDlugoscBoku*(i+1) : p[b][2] + nowaDlugoscBoku*(i+1);
+			
+			for (int j = 0; j<4; j++)
+			{
+				glBegin(GL_TRIANGLES);
+					GLfloat c= 0.2 * (j+1);
+					glColor3f(c, c, c);
+					glVertex3fv(malaP[j]);
+					if (j+1>3)
+						glVertex3fv(malaP[0]);
+					else
+						glVertex3fv(malaP[j+1]);
+					glVertex3fv(p[b]);
+				glEnd();
+			}
+			glBegin(GL_QUADS);
+				glVertex3fv(malaP[0]);
+				glVertex3fv(malaP[1]);
+				glVertex3fv(malaP[2]);
+				glVertex3fv(malaP[3]);
+			glEnd();
+			
+		}
+
+	}
+	for (int i = 0; i<4; i++)
+	{
+		glBegin(GL_TRIANGLES);
+			GLfloat c= 0.2 * (i+1);
+			glColor3f(c, c, c);
+			glVertex3fv(p[i]);
+			if (i+1>3)
+				glVertex3fv(p[0]);
+			else
+				glVertex3fv(p[i+1]);
+			glVertex3fv(pw);
+		glEnd();
+	}
+	glBegin(GL_QUADS);
+		glVertex3fv(p[0]);
+		glVertex3fv(p[1]);
+		glVertex3fv(p[2]);
+		glVertex3fv(p[3]);
+	glEnd();
+}
 void Egg(void)
 {
 	int n = 10;
 	point3 pw;
 	point3* p = new point3[4];
-	point3* malaP = new point3[4];
 	//point3** tablica = new point3*[n];
 	/*
 	for (int i =0; i < n; i++)
@@ -90,71 +163,9 @@ void Egg(void)
 	pw[0] = 0 * krotnosc;
 	pw[1] = 1 * krotnosc;
 	pw[2] = 0 * krotnosc;
-	glBegin(GL_QUADS);
-		glVertex3fv(p[0]);
-		glVertex3fv(p[1]);
-		glVertex3fv(p[2]);
-		glVertex3fv(p[3]);
-	glEnd();
-	float m = 2;
-	for (int i = 0; i<m-1; i++)
-	{ 
-		float nowaDlugoscBoku = dlugoscBoku / (float)m;
-		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
-		
-		for (int b = 0; b<4; b++)
-		{
-			malaP[0][0] = p[b][0];
-			malaP[0][1] = p[b][1];
-			malaP[0][2] = p[b][2];
-
-			malaP[1][0] = p[b][0];
-			malaP[1][1] = p[b][1];
-			malaP[1][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
-
-			malaP[2][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
-			malaP[2][1] = p[b][1];
-			malaP[2][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
-
-			malaP[3][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
-			malaP[3][1] = p[b][1];
-			malaP[3][2] = p[b][2];
-
-			p[b][0]= p[b][0]>0 ? p[b][0] - nowaDlugoscBoku*(i+1) : p[b][0] + nowaDlugoscBoku*(i+1);
-			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
-			p[b][2]= p[b][2]>0 ? p[b][2] - nowaDlugoscBoku*(i+1) : p[b][2] + nowaDlugoscBoku*(i+1);
-			
-			for (int j = 0; j<4; j++)
-			{
-				glBegin(GL_TRIANGLES);
-					GLfloat c= 0.2 * (j+1);
-					glColor3f(c, c, c);
-					glVertex3fv(malaP[j]);
-					if (j+1>3)
-						glVertex3fv(malaP[0]);
-					else
-						glVertex3fv(malaP[j+1]);
-					glVertex3fv(p[b]);
-				glEnd();
-			}
-			
-		}
-
-	}
-	for (int i = 0; i<4; i++)
-	{
-		glBegin(GL_TRIANGLES);
-			GLfloat c= 0.2 * (i+1);
-			glColor3f(c, c, c);
-			glVertex3fv(p[i]);
-			if (i+1>3)
-				glVertex3fv(p[0]);
-			else
-				glVertex3fv(p[i+1]);
-			glVertex3fv(pw);
-		glEnd();
-	}
+	dzielTrojkaty(p,pw, dlugoscBoku, dlugoscWysokosci);
 }
+
 void Axes(void)
 {
 	
