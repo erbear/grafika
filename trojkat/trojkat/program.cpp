@@ -37,16 +37,25 @@ void spinEgg()
 
     glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
 }
-void dzielTrojkaty(point3* p,point3 pw, float dlugoscBoku, float dlugoscWysokosci)
+void dzielTrojkaty(point3* p,point3 pw, float dlugoscBoku, float dlugoscWysokosci, int poziom, int ktory)
 {
+	int ostatniPoziom =	2;
 	float m = 2;
+	int nowyPoziom = poziom + 1;
 	for (int i = 0; i<m-1; i++)
 	{ 
+		
 		float nowaDlugoscBoku = dlugoscBoku / (float)m;
 		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
 		
 		for (int b = 0; b<4; b++)
 		{
+			bool zmienilemKtory = false;
+			if (ktory == -1 )
+			{
+				ktory = b;
+				zmienilemKtory = true;
+			}
 			point3* malaP = new point3[4];
 			malaP[0][0] = p[b][0];
 			malaP[0][1] = p[b][1];
@@ -54,62 +63,100 @@ void dzielTrojkaty(point3* p,point3 pw, float dlugoscBoku, float dlugoscWysokosc
 
 			malaP[1][0] = p[b][0];
 			malaP[1][1] = p[b][1];
-			malaP[1][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
-
-			malaP[2][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			if (ktory == 0 || ktory == 1)
+				malaP[1][2] = p[b][2] + dlugoscBoku;
+			else
+				malaP[1][2] = p[b][2] - dlugoscBoku;
+			
+			if (ktory ==0 || ktory == 3)
+				malaP[2][0] = p[b][0] + dlugoscBoku;
+			else 
+				malaP[2][0] = p[b][0] - dlugoscBoku;
 			malaP[2][1] = p[b][1];
-			malaP[2][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
-
-			malaP[3][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			
+			if (ktory == 0 || ktory == 1)
+				malaP[2][2] = p[b][2] + dlugoscBoku;
+			else
+				malaP[2][2] = p[b][2] - dlugoscBoku;
+			
+			if (ktory ==0 || ktory == 3)
+				malaP[3][0] = p[b][0] + dlugoscBoku;
+			else 
+				malaP[3][0] = p[b][0] - dlugoscBoku;
 			malaP[3][1] = p[b][1];
 			malaP[3][2] = p[b][2];
-
-			p[b][0]= p[b][0]>0 ? p[b][0] - nowaDlugoscBoku*(i+1) : p[b][0] + nowaDlugoscBoku*(i+1);
-			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
-			p[b][2]= p[b][2]>0 ? p[b][2] - nowaDlugoscBoku*(i+1) : p[b][2] + nowaDlugoscBoku*(i+1);
 			
-			for (int j = 0; j<4; j++)
+			if (zmienilemKtory)
+				ktory = -1;
+			if (ktory ==0 || ktory == 3)
+				p[b][0]= p[b][0] + nowaDlugoscBoku*(i+1);
+			else
+				p[b][0]= p[b][0] - nowaDlugoscBoku*(i+1);
+			
+			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
+			
+			if (ktory ==0 || ktory == 1)
+				p[b][2]= p[b][2] + nowaDlugoscBoku*(i+1);
+			else 
+				p[b][2]= p[b][2] - nowaDlugoscBoku*(i+1);
+			if (ostatniPoziom == poziom)
 			{
-				glBegin(GL_TRIANGLES);
-					GLfloat c= 0.2 * (j+1);
-					glColor3f(c, c, c);
-					glVertex3fv(malaP[j]);
-					if (j+1>3)
-						glVertex3fv(malaP[0]);
-					else
-						glVertex3fv(malaP[j+1]);
-					glVertex3fv(p[b]);
+				for (int j = 0; j<4; j++)
+				{
+					glBegin(GL_TRIANGLES);
+						GLfloat c= 0.2 * (j+1);
+						glColor3f(c, c, c);
+						glVertex3fv(malaP[j]);
+						if (j+1>3)
+							glVertex3fv(malaP[0]);
+						else
+							glVertex3fv(malaP[j+1]);
+						glVertex3fv(p[b]);
+					glEnd();
+				}
+				glBegin(GL_QUADS);
+					glVertex3fv(malaP[0]);
+					glVertex3fv(malaP[1]);
+					glVertex3fv(malaP[2]);
+					glVertex3fv(malaP[3]);
 				glEnd();
+				if (b==3)
+				{
+					/*
+					for (int x = 0; x<4; x++)
+					{
+						glBegin(GL_TRIANGLES);
+							GLfloat c= 0.2 * (x+1);
+							glColor3f(c, c, c);
+							glVertex3fv(p[x]);
+							if (x+1>3)
+								glVertex3fv(p[0]);
+							else
+								glVertex3fv(p[x+1]);
+							glVertex3fv(pw);
+						glEnd();
+					}
+					glBegin(GL_QUADS);
+						glVertex3fv(p[0]);
+						glVertex3fv(p[1]);
+						glVertex3fv(p[2]);
+						glVertex3fv(p[3]);
+					glEnd();
+					*/
+				}
+			} else 
+			{
+				dzielTrojkaty(malaP,p[b], nowaDlugoscBoku, nowaDlugoscWysokosci, nowyPoziom, b);
+				//if (b==3)
+				//{
+				//	dzielTrojkaty(p,pw, nowaDlugoscBoku, nowaDlugoscWysokosci, nowyPoziom);
+				//}
 			}
-			glBegin(GL_QUADS);
-				glVertex3fv(malaP[0]);
-				glVertex3fv(malaP[1]);
-				glVertex3fv(malaP[2]);
-				glVertex3fv(malaP[3]);
-			glEnd();
 			
 		}
-
+		
 	}
-	for (int i = 0; i<4; i++)
-	{
-		glBegin(GL_TRIANGLES);
-			GLfloat c= 0.2 * (i+1);
-			glColor3f(c, c, c);
-			glVertex3fv(p[i]);
-			if (i+1>3)
-				glVertex3fv(p[0]);
-			else
-				glVertex3fv(p[i+1]);
-			glVertex3fv(pw);
-		glEnd();
-	}
-	glBegin(GL_QUADS);
-		glVertex3fv(p[0]);
-		glVertex3fv(p[1]);
-		glVertex3fv(p[2]);
-		glVertex3fv(p[3]);
-	glEnd();
+	
 }
 void Egg(void)
 {
@@ -151,19 +198,23 @@ void Egg(void)
 	p[0][0]= -1 * krotnosc;
 	p[0][1]= -1 * krotnosc;
 	p[0][2]= -1 * krotnosc;
+
 	p[1][0]= 1 * krotnosc;
 	p[1][1]= -1 * krotnosc;
 	p[1][2]= -1 * krotnosc;
+
 	p[2][0]= 1 * krotnosc;
 	p[2][1]= -1 * krotnosc;
 	p[2][2]= 1 * krotnosc;
+
 	p[3][0]= -1 * krotnosc;
 	p[3][1]= -1 * krotnosc;
 	p[3][2]= 1 * krotnosc;
+
 	pw[0] = 0 * krotnosc;
 	pw[1] = 1 * krotnosc;
 	pw[2] = 0 * krotnosc;
-	dzielTrojkaty(p,pw, dlugoscBoku, dlugoscWysokosci);
+	dzielTrojkaty(p,pw, dlugoscBoku, dlugoscWysokosci, 1, -1);
 }
 
 void Axes(void)
