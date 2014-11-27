@@ -101,91 +101,45 @@ void Egg(void)
 	{ 
 		float nowaDlugoscBoku = dlugoscBoku / (float)m;
 		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
-		malaP[0][0] = p[0][0];
-		malaP[0][1] = p[0][1];
-		malaP[0][2] = p[0][2];
-
-		malaP[1][0] = p[0][0];
-		malaP[1][1] = p[0][1];
-		malaP[1][2] = p[0][2] + dlugoscBoku;
-
-		malaP[2][0] = p[0][0] + dlugoscBoku;
-		malaP[2][1] = p[0][1];
-		malaP[2][2] = p[0][2] +	dlugoscBoku;
-
-		malaP[3][0] = p[0][0] + dlugoscBoku;
-		malaP[3][1] = p[0][1];
-		malaP[3][2] = p[0][2];
-
-		p[0][0]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
-		p[0][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
-		p[0][2]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
 		
-		for (int j = 0; j<4; j++)
+		for (int b = 0; b<4; b++)
 		{
-			glBegin(GL_TRIANGLES);
-				GLfloat c= 0.2 * (j+1);
-				glColor3f(c, c, c);
-				glVertex3fv(malaP[j]);
-				if (j+1>3)
-					glVertex3fv(malaP[0]);
-				else
-					glVertex3fv(malaP[j+1]);
-				glVertex3fv(p[0]);
-			glEnd();
-		}
-		malaP[0][0] = p[1][0];
-		malaP[0][1] = p[1][1];
-		malaP[0][2] = p[1][2];
+			malaP[0][0] = p[b][0];
+			malaP[0][1] = p[b][1];
+			malaP[0][2] = p[b][2];
 
-		malaP[1][0] = p[1][0];
-		malaP[1][1] = p[1][1];
-		malaP[1][2] = p[1][2] + dlugoscBoku;
+			malaP[1][0] = p[b][0];
+			malaP[1][1] = p[b][1];
+			malaP[1][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
 
-		malaP[2][0] = p[1][0] - dlugoscBoku;
-		malaP[2][1] = p[1][1];
-		malaP[2][2] = p[1][2] +	dlugoscBoku;
+			malaP[2][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			malaP[2][1] = p[b][1];
+			malaP[2][2] = p[b][2]> 0 ? p[b][2] - dlugoscBoku : p[b][2] + dlugoscBoku;
 
-		malaP[3][0] = p[1][0] - dlugoscBoku;
-		malaP[3][1] = p[1][1];
-		malaP[3][2] = p[1][2];
+			malaP[3][0] = p[b][0]>0 ?  p[b][0] - dlugoscBoku : p[b][0] + dlugoscBoku;
+			malaP[3][1] = p[b][1];
+			malaP[3][2] = p[b][2];
 
-		p[1][0]= p[1][0] - nowaDlugoscBoku*(i+1);
-		p[1][1]= p[1][1] + nowaDlugoscWysokosci*(i+1);
-		p[1][2]= p[1][2] + nowaDlugoscBoku*(i+1);
-		
-		for (int j = 0; j<4; j++)
-		{
-			glBegin(GL_TRIANGLES);
-				GLfloat c= 0.2 * (j+1);
-				glColor3f(c, c, c);
-				glVertex3fv(malaP[j]);
-				if (j+1>3)
-					glVertex3fv(malaP[0]);
-				else
-					glVertex3fv(malaP[j+1]);
-				glVertex3fv(p[1]);
-			glEnd();
+			p[b][0]= p[b][0]>0 ? p[b][0] - nowaDlugoscBoku*(i+1) : p[b][0] + nowaDlugoscBoku*(i+1);
+			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
+			p[b][2]= p[b][2]>0 ? p[b][2] - nowaDlugoscBoku*(i+1) : p[b][2] + nowaDlugoscBoku*(i+1);
+			
+			for (int j = 0; j<4; j++)
+			{
+				glBegin(GL_TRIANGLES);
+					GLfloat c= 0.2 * (j+1);
+					glColor3f(c, c, c);
+					glVertex3fv(malaP[j]);
+					if (j+1>3)
+						glVertex3fv(malaP[0]);
+					else
+						glVertex3fv(malaP[j+1]);
+					glVertex3fv(p[b]);
+				glEnd();
+			}
+			
 		}
 
-		//p[1][0]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
-		//p[1][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
-		//p[1][2]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
-
-		p[2][0]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
-		p[2][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
-		p[2][2]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
-
-		p[3][0]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
-		p[3][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
-		p[3][2]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
-
-		glBegin(GL_QUADS);
-			glVertex3fv(p[0]);
-			glVertex3fv(p[1]);
-			glVertex3fv(p[2]);
-			glVertex3fv(p[3]);
-		glEnd();
 	}
 	for (int i = 0; i<4; i++)
 	{
