@@ -72,27 +72,58 @@ void Egg(void)
 	}
 	*/
 	int krotnosc = 3;
-	p[0][0]= 0 * krotnosc;
-	p[0][1]= 0 * krotnosc;
-	p[0][2]= 0 * krotnosc;
+	float dlugoscBoku = 1 * krotnosc;
+	float dlugoscWysokosci = 2 * krotnosc;
+	p[0][0]= -1 * krotnosc;
+	p[0][1]= -1 * krotnosc;
+	p[0][2]= -1 * krotnosc;
 	p[1][0]= 1 * krotnosc;
-	p[1][1]= 0 * krotnosc;
-	p[1][2]= 0 * krotnosc;
+	p[1][1]= -1 * krotnosc;
+	p[1][2]= -1 * krotnosc;
 	p[2][0]= 1 * krotnosc;
-	p[2][1]= 0 * krotnosc;
+	p[2][1]= -1 * krotnosc;
 	p[2][2]= 1 * krotnosc;
-	p[3][0]= 0 * krotnosc;
-	p[3][1]= 0 * krotnosc;
+	p[3][0]= -1 * krotnosc;
+	p[3][1]= -1 * krotnosc;
 	p[3][2]= 1 * krotnosc;
-	pw[0] = 0.5 * krotnosc;
+	pw[0] = 0 * krotnosc;
 	pw[1] = 1 * krotnosc;
-	pw[2] = 0.5 * krotnosc;
+	pw[2] = 0 * krotnosc;
 	glBegin(GL_QUADS);
 		glVertex3fv(p[0]);
 		glVertex3fv(p[1]);
 		glVertex3fv(p[2]);
 		glVertex3fv(p[3]);
 	glEnd();
+	int m = 3;
+	for (int i = 0; i<m; i++)
+	{ 
+		float nowaDlugoscBoku = dlugoscBoku / (float)m;
+		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
+
+		p[0][0]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
+		p[0][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
+		p[0][2]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
+
+		p[1][0]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
+		p[1][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
+		p[1][2]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
+
+		p[2][0]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
+		p[2][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
+		p[2][2]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
+
+		p[3][0]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
+		p[3][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
+		p[3][2]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
+
+		glBegin(GL_QUADS);
+			glVertex3fv(p[0]);
+			glVertex3fv(p[1]);
+			glVertex3fv(p[2]);
+			glVertex3fv(p[3]);
+		glEnd();
+	}
 	for (int i = 0; i<4; i++)
 	{
 		glBegin(GL_TRIANGLES);
@@ -318,7 +349,7 @@ void main(void)
 	glEnable(GL_DEPTH_TEST);
 	// W³¹czenie mechanizmu usuwania powierzchni niewidocznych
 	
-	glutIdleFunc(spinEgg);
+	//glutIdleFunc(spinEgg);
 	glutMainLoop();
 	// Funkcja uruchamia szkielet biblioteki GLUT
 
