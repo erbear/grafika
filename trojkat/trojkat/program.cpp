@@ -26,13 +26,13 @@ float randomColor()
 } 
 void spinEgg()
 {
-    theta[0] -= 0.1;
+    theta[0] -= 0.01;
     if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-    theta[1] -= 0.1;
+    theta[1] -= 0.01;
     if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-    theta[2] -= 0.1;
+    theta[2] -= 0.01;
     if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
     glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
@@ -42,6 +42,7 @@ void Egg(void)
 	int n = 10;
 	point3 pw;
 	point3* p = new point3[4];
+	point3* malaP = new point3[4];
 	//point3** tablica = new point3*[n];
 	/*
 	for (int i =0; i < n; i++)
@@ -72,7 +73,7 @@ void Egg(void)
 	}
 	*/
 	int krotnosc = 3;
-	float dlugoscBoku = 1 * krotnosc;
+	float dlugoscBoku = 1 * krotnosc;// 1/2 boku
 	float dlugoscWysokosci = 2 * krotnosc;
 	p[0][0]= -1 * krotnosc;
 	p[0][1]= -1 * krotnosc;
@@ -95,15 +96,44 @@ void Egg(void)
 		glVertex3fv(p[2]);
 		glVertex3fv(p[3]);
 	glEnd();
-	int m = 3;
-	for (int i = 0; i<m; i++)
+	float m = 2;
+	for (int i = 0; i<m-1; i++)
 	{ 
 		float nowaDlugoscBoku = dlugoscBoku / (float)m;
 		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
+		malaP[0][0] = p[0][0];
+		malaP[0][1] = p[0][1];
+		malaP[0][2] = p[0][2];
+
+		malaP[1][0] = p[0][0];
+		malaP[1][1] = p[0][1];
+		malaP[1][2] = p[0][2] + dlugoscBoku;
+
+		malaP[2][0] = p[0][0] + dlugoscBoku;
+		malaP[2][1] = p[0][1];
+		malaP[2][2] = p[0][2] +	dlugoscBoku;
+
+		malaP[3][0] = p[0][0] + dlugoscBoku;
+		malaP[3][1] = p[0][1];
+		malaP[3][2] = p[0][2];
 
 		p[0][0]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
 		p[0][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
 		p[0][2]= -1 * krotnosc + nowaDlugoscBoku*(i+1);
+		
+		for (int j = 0; j<4; j++)
+		{
+			glBegin(GL_TRIANGLES);
+				GLfloat c= 0.2 * (j+1);
+				glColor3f(c, c, c);
+				glVertex3fv(malaP[j]);
+				if (j+1>3)
+					glVertex3fv(malaP[0]);
+				else
+					glVertex3fv(malaP[j+1]);
+				glVertex3fv(p[0]);
+			glEnd();
+		}
 
 		p[1][0]= 1 * krotnosc - nowaDlugoscBoku*(i+1);
 		p[1][1]= -1 * krotnosc + nowaDlugoscWysokosci*(i+1);
@@ -138,7 +168,6 @@ void Egg(void)
 		glEnd();
 	}
 }
-
 void Axes(void)
 {
 	
@@ -349,7 +378,7 @@ void main(void)
 	glEnable(GL_DEPTH_TEST);
 	// W³¹czenie mechanizmu usuwania powierzchni niewidocznych
 	
-	//glutIdleFunc(spinEgg);
+	glutIdleFunc(spinEgg);
 	glutMainLoop();
 	// Funkcja uruchamia szkielet biblioteki GLUT
 
