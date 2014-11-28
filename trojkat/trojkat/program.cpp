@@ -10,6 +10,7 @@
 #include <gl/glut.h>
 #include <vector>
 #include <math.h>
+#include <cstdlib>
 
 # define M_PI           3.14159265358979323846
 
@@ -37,126 +38,147 @@ void spinEgg()
 
     glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
 }
-void dzielTrojkaty(point3* p,point3 pw, float dlugoscBoku, float dlugoscWysokosci, int poziom, int ktory)
-{
-	int ostatniPoziom =	2;
-	float m = 2;
-	int nowyPoziom = poziom + 1;
-	for (int i = 0; i<m-1; i++)
-	{ 
-		
-		float nowaDlugoscBoku = dlugoscBoku / (float)m;
-		float nowaDlugoscWysokosci = dlugoscWysokosci / (float)m;
-		
-		for (int b = 0; b<4; b++)
-		{
-			bool zmienilemKtory = false;
-			if (ktory == -1 )
-			{
-				ktory = b;
-				zmienilemKtory = true;
-			}
-			point3* malaP = new point3[4];
-			malaP[0][0] = p[b][0];
-			malaP[0][1] = p[b][1];
-			malaP[0][2] = p[b][2];
-
-			malaP[1][0] = p[b][0];
-			malaP[1][1] = p[b][1];
-			if (ktory == 0 || ktory == 1)
-				malaP[1][2] = p[b][2] + dlugoscBoku;
+void budujTrojkat(point3* p, float d = 0){
+	point3 wierzcholek;
+	float dlugosc = abs(p[0][0] - p[1][0]);
+	if (d!=0)
+		dlugosc = d;
+	wierzcholek[0]=p[0][0] + dlugosc/2;
+	wierzcholek[1]=p[0][1] + dlugosc;
+	wierzcholek[2]=p[0][2] + dlugosc/2;
+	for (int j = 0; j<4; j++)
+	{
+		glBegin(GL_TRIANGLES);
+			GLfloat c= 0.2 * (j+1);
+			glColor3f(c, c, c);
+			glVertex3fv(p[j]);
+			if (j+1>3)
+				glVertex3fv(p[0]);
 			else
-				malaP[1][2] = p[b][2] - dlugoscBoku;
-			
-			if (ktory ==0 || ktory == 3)
-				malaP[2][0] = p[b][0] + dlugoscBoku;
-			else 
-				malaP[2][0] = p[b][0] - dlugoscBoku;
-			malaP[2][1] = p[b][1];
-			
-			if (ktory == 0 || ktory == 1)
-				malaP[2][2] = p[b][2] + dlugoscBoku;
-			else
-				malaP[2][2] = p[b][2] - dlugoscBoku;
-			
-			if (ktory ==0 || ktory == 3)
-				malaP[3][0] = p[b][0] + dlugoscBoku;
-			else 
-				malaP[3][0] = p[b][0] - dlugoscBoku;
-			malaP[3][1] = p[b][1];
-			malaP[3][2] = p[b][2];
-			
-			if (zmienilemKtory)
-				ktory = -1;
-			if (ktory ==0 || ktory == 3)
-				p[b][0]= p[b][0] + nowaDlugoscBoku*(i+1);
-			else
-				p[b][0]= p[b][0] - nowaDlugoscBoku*(i+1);
-			
-			p[b][1]= p[b][1] + nowaDlugoscWysokosci*(i+1);
-			
-			if (ktory ==0 || ktory == 1)
-				p[b][2]= p[b][2] + nowaDlugoscBoku*(i+1);
-			else 
-				p[b][2]= p[b][2] - nowaDlugoscBoku*(i+1);
-			if (ostatniPoziom == poziom)
-			{
-				for (int j = 0; j<4; j++)
-				{
-					glBegin(GL_TRIANGLES);
-						GLfloat c= 0.2 * (j+1);
-						glColor3f(c, c, c);
-						glVertex3fv(malaP[j]);
-						if (j+1>3)
-							glVertex3fv(malaP[0]);
-						else
-							glVertex3fv(malaP[j+1]);
-						glVertex3fv(p[b]);
-					glEnd();
-				}
-				glBegin(GL_QUADS);
-					glVertex3fv(malaP[0]);
-					glVertex3fv(malaP[1]);
-					glVertex3fv(malaP[2]);
-					glVertex3fv(malaP[3]);
-				glEnd();
-				if (b==3)
-				{
-					/*
-					for (int x = 0; x<4; x++)
-					{
-						glBegin(GL_TRIANGLES);
-							GLfloat c= 0.2 * (x+1);
-							glColor3f(c, c, c);
-							glVertex3fv(p[x]);
-							if (x+1>3)
-								glVertex3fv(p[0]);
-							else
-								glVertex3fv(p[x+1]);
-							glVertex3fv(pw);
-						glEnd();
-					}
-					glBegin(GL_QUADS);
-						glVertex3fv(p[0]);
-						glVertex3fv(p[1]);
-						glVertex3fv(p[2]);
-						glVertex3fv(p[3]);
-					glEnd();
-					*/
-				}
-			} else 
-			{
-				dzielTrojkaty(malaP,p[b], nowaDlugoscBoku, nowaDlugoscWysokosci, nowyPoziom, b);
-				//if (b==3)
-				//{
-				//	dzielTrojkaty(p,pw, nowaDlugoscBoku, nowaDlugoscWysokosci, nowyPoziom);
-				//}
-			}
-			
-		}
-		
+				glVertex3fv(p[j+1]);
+			glVertex3fv(wierzcholek);
+		glEnd();
+		glBegin(GL_QUADS);
+			glVertex3fv(p[0]);
+			glVertex3fv(p[1]);
+			glVertex3fv(p[2]);
+			glVertex3fv(p[3]);
+		glEnd();
 	}
+}
+void oliczWierzcholek(point3* p)
+{
+
+}
+void dzielTrojkaty(point3* p, int poziom)
+{	
+	int ostatniPoziom = 2;
+	int nastepnyPoziom = poziom + 1;
+	point3* w = new point3[4];
+	point3* wierzcholki = new point3[4];
+	//pierwszy
+	float dlugosc = abs(p[0][0] - p[1][0]);
+	w[0][0] = p[0][0];
+	w[0][1] = p[0][1];
+	w[0][2] = p[0][2];
 	
+	w[1][0] = p[0][0] + dlugosc/2;
+	w[1][1] = p[0][1];
+	w[1][2] = p[0][2];
+
+	w[2][0] = p[0][0] + dlugosc/2;
+	w[2][1] = p[0][1];
+	w[2][2] = p[0][2] + dlugosc/2;
+
+	w[3][0] = p[0][0];
+	w[3][1] = p[0][1];
+	w[3][2] = p[0][2] + dlugosc/2;
+	
+	if (poziom<ostatniPoziom)
+		dzielTrojkaty(w, nastepnyPoziom);
+	else
+		budujTrojkat(w);
+	
+	float dlugoscWierzcholka = abs(w[0][0] - w[1][0]);
+	wierzcholki[0][0]=w[0][0] + dlugoscWierzcholka/2;
+	wierzcholki[0][1]=w[0][1] + dlugoscWierzcholka;
+	wierzcholki[0][2]=w[0][2] + dlugoscWierzcholka/2;
+
+	w[0][0] = p[0][0];
+	w[0][1] = p[0][1];
+	w[0][2] = p[0][2]+ dlugosc/2;
+	
+	w[1][0] = p[0][0]+ dlugosc/2;
+	w[1][1] = p[0][1];
+	w[1][2] = p[0][2]+ dlugosc/2;
+
+	w[2][0] = p[0][0]+ dlugosc/2;
+	w[2][1] = p[0][1];
+	w[2][2] = p[0][2]+ dlugosc;
+
+	w[3][0] = p[0][0];
+	w[3][1] = p[0][1];
+	w[3][2] = p[0][2]+ dlugosc;
+
+	if (poziom<ostatniPoziom)
+		dzielTrojkaty(w, nastepnyPoziom);
+	else
+		budujTrojkat(w);
+	
+	wierzcholki[1][0]=w[0][0] + dlugoscWierzcholka/2;
+	wierzcholki[1][1]=w[0][1] + dlugoscWierzcholka;
+	wierzcholki[1][2]=w[0][2] + dlugoscWierzcholka/2;
+	
+	w[0][0] = p[0][0] + dlugosc/2;
+	w[0][1] = p[0][1];
+	w[0][2] = p[0][2] + dlugosc/2;
+	
+	w[1][0] = p[0][0] + dlugosc;
+	w[1][1] = p[0][1];
+	w[1][2] = p[0][2] + dlugosc/2;
+
+	w[2][0] = p[0][0] + dlugosc;
+	w[2][1] = p[0][1];
+	w[2][2] = p[0][2] + dlugosc;
+
+	w[3][0] = p[0][0]+ dlugosc/2;
+	w[3][1] = p[0][1];
+	w[3][2] = p[0][2] + dlugosc;
+
+	if (poziom<ostatniPoziom)
+		dzielTrojkaty(w, nastepnyPoziom);
+	else
+		budujTrojkat(w);
+
+	wierzcholki[2][0]=w[0][0] + dlugoscWierzcholka/2;
+	wierzcholki[2][1]=w[0][1] + dlugoscWierzcholka;
+	wierzcholki[2][2]=w[0][2] + dlugoscWierzcholka/2;
+
+	w[0][0] = p[0][0] + dlugosc/2;
+	w[0][1] = p[0][1];
+	w[0][2] = p[0][2];
+	
+	w[1][0] = p[0][0] + dlugosc;
+	w[1][1] = p[0][1];
+	w[1][2] = p[0][2];
+
+	w[2][0] = p[0][0] + dlugosc;
+	w[2][1] = p[0][1];
+	w[2][2] = p[0][2] + dlugosc/2;
+
+	w[3][0] = p[0][0]+ dlugosc/2;
+	w[3][1] = p[0][1];
+	w[3][2] = p[0][2] + dlugosc/2;
+
+	if (poziom<ostatniPoziom)
+		dzielTrojkaty(w, nastepnyPoziom);
+	else
+		budujTrojkat(w);
+
+	wierzcholki[3][0]=w[0][0] + dlugoscWierzcholka/2;
+	wierzcholki[3][1]=w[0][1] + dlugoscWierzcholka;
+	wierzcholki[3][2]=w[0][2] + dlugoscWierzcholka/2;
+	budujTrojkat(wierzcholki, dlugosc/2);
 }
 void Egg(void)
 {
@@ -193,28 +215,28 @@ void Egg(void)
 	}
 	*/
 	int krotnosc = 3;
-	float dlugoscBoku = 1 * krotnosc;// 1/2 boku
+	float dlugoscBoku = 2 * krotnosc;// 1/2 boku
 	float dlugoscWysokosci = 2 * krotnosc;
-	p[0][0]= -1 * krotnosc;
-	p[0][1]= -1 * krotnosc;
-	p[0][2]= -1 * krotnosc;
+	p[0][0]= 0 * krotnosc;
+	p[0][1]= 0 * krotnosc;
+	p[0][2]= 0 * krotnosc;
 
-	p[1][0]= 1 * krotnosc;
-	p[1][1]= -1 * krotnosc;
-	p[1][2]= -1 * krotnosc;
+	p[1][0]= 2 * krotnosc;
+	p[1][1]= 0 * krotnosc;
+	p[1][2]= 0 * krotnosc;
 
-	p[2][0]= 1 * krotnosc;
-	p[2][1]= -1 * krotnosc;
-	p[2][2]= 1 * krotnosc;
+	p[2][0]= 2 * krotnosc;
+	p[2][1]= 0 * krotnosc;
+	p[2][2]= 2 * krotnosc;
 
-	p[3][0]= -1 * krotnosc;
-	p[3][1]= -1 * krotnosc;
-	p[3][2]= 1 * krotnosc;
+	p[3][0]= 0 * krotnosc;
+	p[3][1]= 0 * krotnosc;
+	p[3][2]= 2 * krotnosc;
 
-	pw[0] = 0 * krotnosc;
-	pw[1] = 1 * krotnosc;
-	pw[2] = 0 * krotnosc;
-	dzielTrojkaty(p,pw, dlugoscBoku, dlugoscWysokosci, 1, -1);
+	pw[0] = 1 * krotnosc;
+	pw[1] = 2 * krotnosc;
+	pw[2] = 1 * krotnosc;
+	dzielTrojkaty(p, 1);
 }
 
 void Axes(void)
