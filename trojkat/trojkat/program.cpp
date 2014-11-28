@@ -70,14 +70,16 @@ void oliczWierzcholek(point3* p)
 {
 
 }
-void dzielTrojkaty(point3* p, int poziom)
+void dzielTrojkaty(point3* p, int poziom, float d = 0)
 {	
-	int ostatniPoziom = 2;
+	int ostatniPoziom = 3;
 	int nastepnyPoziom = poziom + 1;
 	point3* w = new point3[4];
 	point3* wierzcholki = new point3[4];
 	//pierwszy
 	float dlugosc = abs(p[0][0] - p[1][0]);
+	if (d!=0)
+		dlugosc = d;
 	w[0][0] = p[0][0];
 	w[0][1] = p[0][1];
 	w[0][2] = p[0][2];
@@ -95,7 +97,7 @@ void dzielTrojkaty(point3* p, int poziom)
 	w[3][2] = p[0][2] + dlugosc/2;
 	
 	if (poziom<ostatniPoziom)
-		dzielTrojkaty(w, nastepnyPoziom);
+		dzielTrojkaty(w, nastepnyPoziom, dlugosc/2);
 	else
 		budujTrojkat(w);
 	
@@ -121,7 +123,7 @@ void dzielTrojkaty(point3* p, int poziom)
 	w[3][2] = p[0][2]+ dlugosc;
 
 	if (poziom<ostatniPoziom)
-		dzielTrojkaty(w, nastepnyPoziom);
+		dzielTrojkaty(w, nastepnyPoziom, dlugosc/2);
 	else
 		budujTrojkat(w);
 	
@@ -146,7 +148,7 @@ void dzielTrojkaty(point3* p, int poziom)
 	w[3][2] = p[0][2] + dlugosc;
 
 	if (poziom<ostatniPoziom)
-		dzielTrojkaty(w, nastepnyPoziom);
+		dzielTrojkaty(w, nastepnyPoziom, dlugosc/2);
 	else
 		budujTrojkat(w);
 
@@ -171,14 +173,17 @@ void dzielTrojkaty(point3* p, int poziom)
 	w[3][2] = p[0][2] + dlugosc/2;
 
 	if (poziom<ostatniPoziom)
-		dzielTrojkaty(w, nastepnyPoziom);
+		dzielTrojkaty(w, nastepnyPoziom, dlugosc/2);
 	else
 		budujTrojkat(w);
 
 	wierzcholki[3][0]=w[0][0] + dlugoscWierzcholka/2;
 	wierzcholki[3][1]=w[0][1] + dlugoscWierzcholka;
 	wierzcholki[3][2]=w[0][2] + dlugoscWierzcholka/2;
-	budujTrojkat(wierzcholki, dlugosc/2);
+	if (poziom<ostatniPoziom)
+		dzielTrojkaty(wierzcholki, nastepnyPoziom, dlugosc/2);
+	else
+		budujTrojkat(wierzcholki, dlugosc/2);
 }
 void Egg(void)
 {
