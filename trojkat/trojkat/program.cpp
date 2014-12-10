@@ -11,32 +11,86 @@
 #include <vector>
 #include <math.h>
 #include <cstdlib>
+#include <ctime>
 
 # define M_PI           3.14159265358979323846
 
 typedef GLfloat point3[3];
 using namespace std;
 static GLfloat theta[] = {0.0, 0.0, 0.0};
+static GLfloat viewer[] = { 0.0, 0.0, 10.0 };
+
+static GLfloat theta1 = 0.0;   // k¹t obrotu obiektu
+static GLfloat theta2 = 0.0;   // k¹t obrotu obiektu
+static GLfloat theta3 = 0.0;   // k¹t obrotu obiektu
+static GLfloat kat1 = 0.0, kat2 = 0.0, r = 0.0;
+static GLfloat pix2angle;     // przelicznik pikseli na stopnie
+
+static GLint status = 0;       // stan klawiszy myszy 
+// 0 - nie naciœniêto ¿adnego klawisza
+// 1 - naciœniêty zostaæ lewy klawisz
+static int afterInit = 0;
+static int x_pos_old = 0;       // poprzednia pozycja kursora myszy
+static int y_pos_old = 0;       // poprzednia pozycja kursora myszy
+static int z_pos_old = 0;       // poprzednia pozycja kursora myszy
+
+static int delta_x = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
+static int delta_y = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
+static int delta_z = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
+// i poprzedni¹ kursora myszy 
 /*************************************************************************************/
 int model = 1;  // 1- punkty, 2- siatka, 3 - wype³nione trójk¹ty
 // Funkcja rysuj¹ca osie uk³adu wspó³rzêdnych
-point3** kolory;
-float randomColor()
+point3* kolory;
+float randomColor(int i)
 {
+	srand( i );
 	return ((float)(rand()%10)+1)/10; 
 } 
-void spinEgg()
+void Mouse(int btn, int state, int x, int y)
 {
-    theta[0] -= 0.01;
-    if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-    theta[1] -= 0.01;
-    if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-    theta[2] -= 0.01;
-    if( theta[2] > 360.0 ) theta[2] -= 360.0;
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		x_pos_old = x;         // przypisanie aktualnie odczytanej pozycji kursora 
+		// jako pozycji poprzedniej
+		y_pos_old = y;         // przypisanie aktualnie odczytanej pozycji kursora 
+		// jako pozycji poprzedniej
+		status = 1;          // wciêniêty zosta³ lewy klawisz myszy
+	} else if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		z_pos_old = y;         // przypisanie aktualnie odczytanej pozycji kursora 
+		// jako pozycji poprzedniej
+		status = 2;          // wciêniêty zosta³ lewy klawisz myszy
+	}
+	else
+		status = 0;          // nie zosta³ wciêniêty ¿aden klawisz 
+}
 
-    glutPostRedisplay(); //odœwie¿enie zawartoœci aktualnego okna
+void Motion(GLsizei x, GLsizei y)
+{
+
+	delta_x =x - x_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy
+	delta_y = y - y_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy    // obliczenie ró¿nicy po³o¿enia kursora myszy
+	delta_z = y - z_pos_old;
+
+	x_pos_old = x;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+	y_pos_old = y;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+	z_pos_old = y;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+
+	glutPostRedisplay();     // przerysowanie obrazu sceny
+}
+void losujKolory()
+{
+	int n = 7;
+	kolory = new point3[n];
+	for (int i =0; i < n; i++)
+	{
+		kolory[i][0] = randomColor(i);
+		kolory[i][1] = randomColor(i);
+		kolory[i][2] = randomColor(i);
+	}
 }
 void budujTrojkat(point3* p, float d = 0){
 	point3 wierzcholek;
@@ -51,17 +105,24 @@ void budujTrojkat(point3* p, float d = 0){
 		glBegin(GL_TRIANGLES);
 			GLfloat c= 0.2 * (j+1);
 			glColor3f(c, c, c);
+			glColor3f(kolory[0][0],kolory[0][1],kolory[0][2]);
 			glVertex3fv(p[j]);
+			glColor3f(kolory[1][0],kolory[1][1],kolory[1][2]);
 			if (j+1>3)
 				glVertex3fv(p[0]);
 			else
 				glVertex3fv(p[j+1]);
+			glColor3f(kolory[2][0],kolory[2][1],kolory[2][2]);
 			glVertex3fv(wierzcholek);
 		glEnd();
 		glBegin(GL_QUADS);
+			glColor3f(kolory[3][0],kolory[3][1],kolory[3][2]);
 			glVertex3fv(p[0]);
+			glColor3f(kolory[4][0],kolory[4][1],kolory[4][2]);
 			glVertex3fv(p[1]);
+			glColor3f(kolory[5][0],kolory[5][1],kolory[5][2]);
 			glVertex3fv(p[2]);
+			glColor3f(kolory[6][0],kolory[6][1],kolory[6][2]);
 			glVertex3fv(p[3]);
 		glEnd();
 	}
@@ -190,57 +251,28 @@ void Egg(void)
 	int n = 10;
 	point3 pw;
 	point3* p = new point3[4];
-	//point3** tablica = new point3*[n];
-	/*
-	for (int i =0; i < n; i++)
-	{
-		tablica[i] = new point3[n];
-		float u = (float)i/(float)n;
-
-		for (int j = 0; j < n; j++){
-			float v = (float)j / (float)n ;
-			for (int t = 0; t < n; t++){
-				float r = (float)t / (float)n ;
-				float x = u*10;
-				float y = v*10;
-				float z = r*10;
-				p[0] = y-5;
-				p[1] = x-2;
-				p[2] = z-2;
-				tablica[i][j][0] = x-5;
-				tablica[i][j][1] = y-5;
-				tablica[i][j][2] = z-5;
-				
-				glBegin(GL_POINTS);
-				if (t>i && t<n-i && j>i && j<n-i)
-					glVertex3fv(p);
-				glEnd();
-			}
-		}
-	}
-	*/
 	int krotnosc = 3;
 	float dlugoscBoku = 2 * krotnosc;// 1/2 boku
 	float dlugoscWysokosci = 2 * krotnosc;
-	p[0][0]= 0 * krotnosc;
-	p[0][1]= 0 * krotnosc;
-	p[0][2]= 0 * krotnosc;
+	p[0][0]= -1 * krotnosc;
+	p[0][1]= -1 * krotnosc;
+	p[0][2]= -1 * krotnosc;
 
-	p[1][0]= 2 * krotnosc;
-	p[1][1]= 0 * krotnosc;
-	p[1][2]= 0 * krotnosc;
+	p[1][0]= 1 * krotnosc;
+	p[1][1]= -1 * krotnosc;
+	p[1][2]= -1 * krotnosc;
 
-	p[2][0]= 2 * krotnosc;
-	p[2][1]= 0 * krotnosc;
-	p[2][2]= 2 * krotnosc;
+	p[2][0]= 1 * krotnosc;
+	p[2][1]= -1 * krotnosc;
+	p[2][2]= 1 * krotnosc;
 
-	p[3][0]= 0 * krotnosc;
-	p[3][1]= 0 * krotnosc;
-	p[3][2]= 2 * krotnosc;
+	p[3][0]= -1 * krotnosc;
+	p[3][1]= -1 * krotnosc;
+	p[3][2]= 1 * krotnosc;
 
-	pw[0] = 1 * krotnosc;
-	pw[1] = 2 * krotnosc;
-	pw[2] = 1 * krotnosc;
+	pw[0] = 0 * krotnosc;
+	pw[1] = 1 * krotnosc;
+	pw[2] = 0 * krotnosc;
 	dzielTrojkaty(p, 1);
 }
 
@@ -299,18 +331,38 @@ void RenderScene(void)
 	// Czyszczenie okna aktualnym kolorem czyszcz¹cym
 
 	glLoadIdentity();
-	// Czyszczenie macierzy bie¿¹cej
-	Axes();
 	// Narysowanie osi przy pomocy funkcji zdefiniowanej wy¿ej 
-	glColor3f(50.0f, 1.0f, 1.0f); // Ustawienie koloru rysowania na bia³y 
+	if (afterInit == 0){
+		afterInit = 1;
+		r = 15.0;
+	}
 
-	glRotated(10.0, 1.0, 1.0, 1.0);  // Obrót o 60 stopni
+	if (status == 1){
+		kat1 += delta_x/100.0;
+		kat2 += delta_y/100.0;
+	}
+	else if (status == 2){
+		r += delta_z/50.0;
+	}
+	if(kat2 >= M_PI) 
+		kat2 -= 2*M_PI;
+    else if(kat2 <= -M_PI) 
+		kat2 += 2*M_PI;
 	
-	glRotatef(theta[0], 1.0, 0.0, 0.0);
+	int upY;
 
-	glRotatef(theta[1], 0.0, 1.0, 0.0);
+    if(kat2 < M_PI/2 && kat2 > -M_PI/2) upY = 1;
+    else upY = -1;
+	
+	viewer[0] = r*cos(kat1)*cos(kat2);
+	viewer[1] = r*sin(kat2);
+	viewer[2] = r*sin(kat1)*cos(kat2);
+	gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, upY,0.0);
+	// Zdefiniowanie po³o¿enia obserwatora
 
-	glRotatef(theta[2], 0.0, 0.0, 1.0);
+	Axes();
+
+	glColor3f(1.0f, 1.0f, 1.0f);
 
 	Egg();
 	glFlush();
@@ -348,57 +400,30 @@ void MyInit(void)
 void ChangeSize(GLsizei horizontal, GLsizei vertical)
 {
 
-	GLfloat AspectRatio;
-	// Deklaracja zmiennej AspectRatio  okreœlaj¹cej proporcjê
-	// wymiarów okna 
-
-
-
-	if (vertical == 0)  // Zabezpieczenie przed dzieleniem przez 0
-
-		vertical = 1;
-
-
-
-	glViewport(0, 0, horizontal, vertical);
-	// Ustawienie wielkoœciokna okna widoku (viewport)
-	// W tym przypadku od (0,0) do (horizontal, vertical)
-
-
-
+	pix2angle = 360.0 / ((float)horizontal);  // przeliczenie pikseli na stopnie
 	glMatrixMode(GL_PROJECTION);
 	// Prze³¹czenie macierzy bie¿¹cej na macierz projekcji
 
-
-
 	glLoadIdentity();
-	// Czyszcznie macierzy bie¿¹cej           
+	// Czyszcznie macierzy bie¿¹cej 
 
-
-
-	AspectRatio = (GLfloat)horizontal / (GLfloat)vertical;
-	// Wyznaczenie wspó³czynnika  proporcji okna
-	// Gdy okno nie jest kwadratem wymagane jest okreœlenie tak zwanej
-	// przestrzeni ograniczaj¹cej pozwalaj¹cej zachowaæ w³aœciwe
-	// proporcje rysowanego obiektu.
-	// Do okreslenia przestrzeni ograniczj¹cej s³u¿y funkcja
-	// glOrtho(...)            
-
+	gluPerspective(70, 1.0, 1.0, 30.0);
+	// Ustawienie parametrów dla rzutu perspektywicznego
 
 
 	if (horizontal <= vertical)
-
-		glOrtho(-7.5, 7.5, -7.5 / AspectRatio, 7.5 / AspectRatio, 10.0, -10.0);
+		glViewport(0, (vertical - horizontal) / 2, horizontal, horizontal);
 
 	else
-
-		glOrtho(-7.5*AspectRatio, 7.5*AspectRatio, -7.5, 7.5, 10.0, -10.0);
+		glViewport((horizontal - vertical) / 2, 0, vertical, vertical);
+	// Ustawienie wielkoœci okna okna widoku (viewport) w zale¿noœci
+	// relacji pomiêdzy wysokoœci¹ i szerokoœci¹ okna
 
 	glMatrixMode(GL_MODELVIEW);
-	// Prze³¹czenie macierzy bie¿¹cej na macierz widoku modelu                                   
+	// Prze³¹czenie macierzy bie¿¹cej na macierz widoku modelu  
 
 	glLoadIdentity();
-	// Czyszcenie macierzy bie¿¹cej
+	// Czyszczenie macierzy bie¿¹cej 
 
 }
 
@@ -417,28 +442,17 @@ void keys(unsigned char key, int x, int y)
 }
 void main(void)
 {
-	int n = 20;
-	kolory = new point3*[n];
-	for (int i =0; i < n; i++)
-	{
-		kolory[i] = new point3[n];
-		for (int j = 0; j < n; j++){
-			kolory[i][j][0] = randomColor();
-			kolory[i][j][1] = randomColor();
-			kolory[i][j][2] = randomColor();
-		}
-	}
+	losujKolory();
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 	glutInitWindowSize(300, 300);
-
+	
 	glutCreateWindow("Uk³ad wspó³rzêdnych 3-D");
 
 	glutDisplayFunc(RenderScene);
 	// Okreœlenie, ¿e funkcja RenderScene bêdzie funkcj¹ zwrotn¹
 	// (callback function).  Bedzie ona wywo³ywana za ka¿dym razem
 	// gdy zajdzie potrzba przeryswania okna
-
 
 
 	glutReshapeFunc(ChangeSize);
@@ -450,13 +464,17 @@ void main(void)
 	MyInit();
 	// Funkcja MyInit() (zdefiniowana powy¿ej) wykonuje wszelkie
 	// inicjalizacje konieczne  przed przyst¹pieniem do renderowania
+	glutKeyboardFunc(keys);
+	glutMouseFunc(Mouse);
+	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie stanu myszy
 
+	glutMotionFunc(Motion);
+	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie ruchu myszy
 	glEnable(GL_DEPTH_TEST);
 	// W³¹czenie mechanizmu usuwania powierzchni niewidocznych
 	
-	glutIdleFunc(spinEgg);
+	//glutIdleFunc(spinEgg);
 	glutMainLoop();
-	// Funkcja uruchamia szkielet biblioteki GLUT
 
 }
 
