@@ -341,12 +341,15 @@ void RenderScene(void)
 		afterInit = 1;
 		r = 15.0;
 	}
-	int canChange = 0;
+	int odlegloscOdTrojkata = 4;
 	if (status == 1){
 		GLfloat pointX = r*cos(kat1+delta_x/100.0)*cos(kat2+delta_y/100.0);
 		GLfloat pointZ = r*sin(kat1+delta_x/100.0)*cos(kat2+delta_y/100.0);
-
-		if (((pointX>3) || (pointX<-3)) || ((pointZ>3) || (pointZ<-3))){
+		GLfloat pointY = r*sin(kat2+delta_y/100.0);
+		GLfloat ograniczeniePlus = odlegloscOdTrojkata - ((pointY+3)/2);
+		GLfloat ograniczenieMinus = ((pointY+3)/2) - odlegloscOdTrojkata;
+		cout<<ograniczeniePlus<<endl<<ograniczenieMinus<<endl<<pointY<<endl;
+		if (((pointX>ograniczeniePlus) || (pointX<ograniczenieMinus)) || ((pointZ>ograniczeniePlus) || (pointZ<ograniczenieMinus)) || ((pointY>3) || (pointY<-3))){
 			kat1 += delta_x/100.0;
 			kat2 += delta_y/100.0;
 		}
@@ -355,8 +358,12 @@ void RenderScene(void)
 		if (r+delta_z/50.0>0){
 			GLfloat pointX = (r+delta_z/50.0)*cos(kat1)*cos(kat2);
 			GLfloat pointZ = (r+delta_z/50.0)*sin(kat1)*cos(kat2);
+			GLfloat pointY = (r+delta_z/50.0)*sin(kat2);
+			GLfloat ograniczeniePlus = odlegloscOdTrojkata - ((pointY+3)/2);
+			GLfloat ograniczenieMinus = ((pointY+3)/2) - odlegloscOdTrojkata;
 
-			if (((pointX>3) || (pointX<-3)) || ((pointZ>3) || (pointZ<-3))){
+			cout<<ograniczeniePlus<<endl<<ograniczenieMinus<<endl<<pointY<<endl;
+			if (((pointX>ograniczeniePlus) || (pointX<ograniczenieMinus)) || ((pointZ>ograniczeniePlus) || (pointZ<ograniczenieMinus))|| ((pointY>3) || (pointY<-3))){
 				r += delta_z/50.0;
 			}
 		}
