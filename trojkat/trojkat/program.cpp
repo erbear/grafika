@@ -330,12 +330,13 @@ void Axes(void)
 
 bool isPass(GLfloat px, GLfloat py, GLfloat pz){
 	int odlegloscOdTrojkata = 4;
-	GLfloat ograniczeniePlus = odlegloscOdTrojkata - ((py+3)/2);
-	GLfloat ograniczenieMinus = ((py+3)/2) - odlegloscOdTrojkata;
-	bool przedzialX = (px>ograniczeniePlus) || (px<ograniczenieMinus);
-	bool przedzialZ = (pz>ograniczeniePlus) || (pz<ograniczenieMinus);
+	GLfloat odlegloscDoOdjecia = ((py+3)/2);
+	GLfloat ograniczeniePlus = odlegloscOdTrojkata - odlegloscDoOdjecia;
+	GLfloat ograniczenieMinus = odlegloscDoOdjecia - odlegloscOdTrojkata;
+	bool przedzialX = ((px>ograniczeniePlus) || (px<ograniczenieMinus)) || ((px<odlegloscDoOdjecia) && (px > -odlegloscDoOdjecia) && py<0);
+	bool przedzialZ = ((pz>ograniczeniePlus) || (pz<ograniczenieMinus)) || ((pz<odlegloscDoOdjecia) && (pz > -odlegloscDoOdjecia) && py<0);
 	bool przedzialY = (py>3) || (py<-3);
-
+	cout<<odlegloscDoOdjecia<<endl;
 	return przedzialX || przedzialY || przedzialZ;
 }
 void RenderScene(void)
