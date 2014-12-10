@@ -12,13 +12,17 @@
 #include <math.h>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 
 # define M_PI           3.14159265358979323846
 
 typedef GLfloat point3[3];
 using namespace std;
+
+point3* punkcik = new point3[4];
 static GLfloat theta[] = {0.0, 0.0, 0.0};
 static GLfloat viewer[] = { 0.0, 0.0, 10.0 };
+static GLfloat wspolrzedne[] = { 0.0, 0.0, 0.0};
 
 static GLfloat theta1 = 0.0;   // k¹t obrotu obiektu
 static GLfloat theta2 = 0.0;   // k¹t obrotu obiektu
@@ -133,7 +137,7 @@ void oliczWierzcholek(point3* p)
 }
 void dzielTrojkaty(point3* p, int poziom, float d = 0)
 {	
-	int ostatniPoziom = 3;
+	int ostatniPoziom = 2;
 	int nastepnyPoziom = poziom + 1;
 	point3* w = new point3[4];
 	point3* wierzcholki = new point3[4];
@@ -273,6 +277,7 @@ void Egg(void)
 	pw[0] = 0 * krotnosc;
 	pw[1] = 1 * krotnosc;
 	pw[2] = 0 * krotnosc;
+	punkcik = p;
 	dzielTrojkaty(p, 1);
 }
 
@@ -336,13 +341,27 @@ void RenderScene(void)
 		afterInit = 1;
 		r = 15.0;
 	}
-
+	int canChange = 0;
 	if (status == 1){
-		kat1 += delta_x/100.0;
-		kat2 += delta_y/100.0;
+		GLfloat pointX = r*cos(kat1+delta_x/100.0)*cos(kat2+delta_y/100.0);
+		GLfloat pointZ = r*sin(kat1+delta_x/100.0)*cos(kat2+delta_y/100.0);
+
+		if (((pointX>3) || (pointX<-3)) || ((pointZ>3) || (pointZ<-3))){
+			kat1 += delta_x/100.0;
+			kat2 += delta_y/100.0;
+		}
 	}
 	else if (status == 2){
-		r += delta_z/50.0;
+		if (r+delta_z/50.0>0){
+			GLfloat pointX = (r+delta_z/50.0)*cos(kat1)*cos(kat2);
+			GLfloat pointZ = (r+delta_z/50.0)*sin(kat1)*cos(kat2);
+
+			if (((pointX>3) || (pointX<-3)) || ((pointZ>3) || (pointZ<-3))){
+				r += delta_z/50.0;
+			}
+		}
+		else
+			r = 0.0001;
 	}
 	if(kat2 >= M_PI) 
 		kat2 -= 2*M_PI;
@@ -353,11 +372,12 @@ void RenderScene(void)
 
     if(kat2 < M_PI/2 && kat2 > -M_PI/2) upY = 1;
     else upY = -1;
-	
+
 	viewer[0] = r*cos(kat1)*cos(kat2);
 	viewer[1] = r*sin(kat2);
 	viewer[2] = r*sin(kat1)*cos(kat2);
 	gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, upY,0.0);
+
 	// Zdefiniowanie po³o¿enia obserwatora
 
 	Axes();
