@@ -38,6 +38,7 @@ static int delta_z = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
 // i poprzedni¹ kursora myszy 
 /*************************************************************************************/
 int model = 1;  // 1- punkty, 2- siatka, 3 - wype³nione trójk¹ty
+int model2 = 4;  // 1- punkty, 2- siatka, 3 - wype³nione trójk¹ty
 // Funkcja rysuj¹ca osie uk³adu wspó³rzêdnych
 point3** kolory;
 // Funkcja "bada" stan myszy i ustawia wartoœci odpowiednich zmiennych globalnych
@@ -357,61 +358,66 @@ void Axes(void)
 void RenderScene(void)
 {
 
+	int upY = 1;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Czyszczenie okna aktualnym kolorem czyszcz¹cym
 
 	glLoadIdentity();
 	// Czyszczenie macierzy bie¿¹cej
-	/*
-	if (status == 2)                     // jeœli lewy klawisz myszy wciêniêty
+	if (model2 == 5)
 	{
-		viewer[2] += delta_z;
+		if (status == 2)                     // jeœli lewy klawisz myszy wciêniêty
+		{
+			viewer[2] += delta_z;
+		}
+		viewer[0] = 0.0;
+		viewer[1] = 0.0;
 	}
-	*/
-	if (afterInit == 0){
-		afterInit = 1;
-		r = 15.0;
-	}
+	if (model2 == 4){
 
-	if (status == 1){
-		kat1 += delta_x/50.0;
-		kat2 += delta_y/50.0;
-	}
-	else if (status == 2){
-		if (r>0)
-			r += delta_z;
-		else
-			r -=delta_z;
-	}
-	if(kat2 >= M_PI) 
-		kat2 -= 2*M_PI;
-    else if(kat2 <= -M_PI) 
-		kat2 += 2*M_PI;
-	
-	int upY;
+		if (afterInit == 0){
+			afterInit = 1;
+			r = 15.0;
+		}
 
-    if(kat2 < M_PI/2 && kat2 > -M_PI/2) upY = 1;
-    else upY = -1;
-	
-	viewer[0] = r*cos(kat1)*cos(kat2);
-	viewer[1] = r*sin(kat2);
-	viewer[2] = r*sin(kat1)*cos(kat2);
+		if (status == 1){
+			kat1 += delta_x/50.0;
+			kat2 += delta_y/50.0;
+		}
+		else if (status == 2){
+			if (r+delta_z>0)
+				r += delta_z;
+		}
+		if(kat2 >= M_PI) 
+			kat2 -= 2*M_PI;
+		else if(kat2 <= -M_PI) 
+			kat2 += 2*M_PI;
+		
+
+		if(kat2 < M_PI/2 && kat2 > -M_PI/2) upY = 1;
+		else upY = -1;
+		
+		viewer[0] = r*cos(kat1)*cos(kat2);
+		viewer[1] = r*sin(kat2);
+		viewer[2] = r*sin(kat1)*cos(kat2);
+	}
 	gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, upY,0.0);
 	// Zdefiniowanie po³o¿enia obserwatora
 
 	Axes();
 	// Narysowanie osi przy pomocy funkcji zdefiniowanej wy¿ej 
-	/* zad 1
-	if (status == 1)                     // jeœli lewy klawisz myszy wciêniêty
+	if (model2 == 5)
 	{
-		theta1 += delta_x*pix2angle;    // modyfikacja k¹ta obrotu o kat proporcjonalny
-		theta2 += delta_y*pix2angle;   // modyfikacja k¹ta obrotu o kat proporcjonalny
+		if (status == 1)                     // jeœli lewy klawisz myszy wciêniêty
+		{
+			theta1 += delta_x*pix2angle;    // modyfikacja k¹ta obrotu o kat proporcjonalny
+			theta2 += delta_y*pix2angle;   // modyfikacja k¹ta obrotu o kat proporcjonalny
 
-	}                                  // do ró¿nicy po³o¿eñ kursora myszy
+		}                                  // do ró¿nicy po³o¿eñ kursora myszy
 
-	glRotatef(theta1, 0.0, 1.0, 0.0);  //obrót obiektu o nowy k¹t
-	glRotatef(theta2, 1.0, 0.0, 0.0);  //obrót obiektu o nowy k¹t
-	*/
+		glRotatef(theta1, 0.0, 1.0, 0.0);  //obrót obiektu o nowy k¹t
+		glRotatef(theta2, 1.0, 0.0, 0.0);  //obrót obiektu o nowy k¹t
+	}
 	
 	
 
@@ -496,7 +502,9 @@ void keys(unsigned char key, int x, int y)
 	if(key == 'p') model = 1;
 	if(key == 'w') model = 2;
 	if(key == 's') model = 3;
-    
+	if(key == 'v') model2 = 4;
+	if(key == 'b') model2 = 5;
+
 	RenderScene(); // przerysowanie obrazu sceny
 }
 void main(void)

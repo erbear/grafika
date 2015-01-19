@@ -137,7 +137,7 @@ void oliczWierzcholek(point3* p)
 }
 void dzielTrojkaty(point3* p, int poziom, float d = 0)
 {	
-	int ostatniPoziom = 2;
+	int ostatniPoziom = 8;
 	int nastepnyPoziom = poziom + 1;
 	point3* w = new point3[4];
 	point3* wierzcholki = new point3[4];
